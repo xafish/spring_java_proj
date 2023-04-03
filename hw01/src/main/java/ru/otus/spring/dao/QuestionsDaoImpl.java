@@ -15,7 +15,7 @@ public class QuestionsDaoImpl implements QuestionsDao {
 
     final private Map<String,List<String>> questions;
 
-    QuestionsDaoImpl(String filePath) {
+    public QuestionsDaoImpl(String filePath) {
         questions = new HashMap<>();
         var fileManager = new FileManager(filePath);
         List<String[]> csvArray = fileManager.getCsvArray();
