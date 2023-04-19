@@ -9,5 +9,4 @@ public interface QuestionsDao {
 
     List<String> findByQuestions(String questionName);
 
-    void runTest();
 }

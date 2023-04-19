@@ -2,63 +2,40 @@ package ru.otus.spring.dao;
 
 
 
-import lombok.Getter;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.otus.spring.utils.FileManager;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
-@Getter
+@Component
 public class QuestionsDaoImpl implements QuestionsDao {
 
-    final private Map<String,List<String>> questions;
+    final private FileManager fileManager;
 
-    private final String ASC_NAME_QUESTION = "What's yor name and surname?";
+    final private Map<String,List<String>> questions = new HashMap<>();
+
+    private final static String ASC_NAME_QUESTION = "What's yor name and surname?";
 
     public QuestionsDaoImpl(FileManager fileManager) {
-        questions = new HashMap<>();
-
-        List<String[]> csvArray = fileManager.getCsvArray();
-        csvArray.forEach(row-> questions.put(row[0], Arrays.asList(Arrays.copyOfRange(row, 1, row.length))));
+        this.fileManager = fileManager;
     }
 
-    @Override
-    public List<String> findByQuestions(String questionName) {
-        return questions.get(questionName);
-    }
-
-    @Override
-    public Map<String,List<String>> getAll() {
+    private Map<String, List<String>> getQuestions() {
+        if (questions.isEmpty()) {
+            List<String[]> csvArray = fileManager.getCsvArray();
+            csvArray.forEach(row-> this.questions.put(row[0], Arrays.asList(Arrays.copyOfRange(row, 1, row.length))));
+        }
         return questions;
     }
 
     @Override
-    public void runTest(){
-        Scanner in = new Scanner(System.in);
-
-        String username = ascName(in);
-
-        AtomicInteger sNum = new AtomicInteger();
-        questions.forEach((q,a)->{
-
-                    System.out.print(q+"?");
-                    String userAnswer = in.nextLine();
-
-                    if (a.contains(userAnswer)) {
-                        sNum.getAndIncrement();
-                    }
-                }
-        );
-        in.close();
-        System.out.printf((sNum.get()==questions.size()?"Well done ":"Good job ")+username+"!\n"
-                +"You answered %d questions out of %d correctly \n", sNum.get(),questions.size()
-        );
+    public List<String> findByQuestions(String questionName) {
+        return getQuestions().get(questionName);
     }
 
-    private String ascName(Scanner in){
-        System.out.print(ASC_NAME_QUESTION);
-        return in.nextLine();
+    @Override
+    public Map<String,List<String>> getAll() {
+        return getQuestions();
     }
+
 }
