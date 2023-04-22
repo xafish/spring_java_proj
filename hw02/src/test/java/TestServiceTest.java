@@ -14,9 +14,11 @@ import java.io.*;
 public class TestServiceTest {
     private TestService testService;
 
+    private ByteArrayOutputStream output;
+
     @BeforeAll
     void beforeAll(){
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        output = new ByteArrayOutputStream();
         System.setIn(new ByteArrayInputStream("testUser\nq1_text1\nq1_text1\nq1_text1\n".getBytes()));
         InputStream inputStream = System.in;
         PrintStream outStream = new PrintStream(output);
@@ -32,5 +34,8 @@ public class TestServiceTest {
         Assertions.assertEquals("testUser", results.name());
         Assertions.assertEquals(3, results.cntQuestions());
         Assertions.assertEquals(1, results.rightQuestions());
+
+        Assertions.assertTrue(output.toString().contains("Good job testUser"));
+        Assertions.assertTrue(output.toString().contains(String.format("You answered %d questions out of %d correctly \n",results.rightQuestions(), results.cntQuestions())));
     }
 }
