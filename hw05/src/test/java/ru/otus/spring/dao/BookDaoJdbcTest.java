@@ -12,7 +12,7 @@ import ru.otus.spring.domain.Genre;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Dao для работы с пёрсонами должно")
+@DisplayName("Dao для работы с книгами должно")
 @JdbcTest
 @Import(BookDaoJdbc.class)
 public class BookDaoJdbcTest {
