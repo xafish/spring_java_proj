@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.otus</groupId>
-    <artifactId>hw01_proj</artifactId>
+    <artifactId>homework_proj</artifactId>
     <version>1.0</version>
 
     <packaging>pom</packaging>
@@ -13,5 +13,6 @@
     <modules>
         <module>hw01</module>
         <module>hw02</module>
+        <module>hw05</module>
     </modules>
 </project>
