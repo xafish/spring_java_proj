@@ -8,6 +8,8 @@ public interface BookRepository {
     List<Book> findAll();
     Book getById(long id);
 
+    Book getByName(String name);
+
     void deleteById(long id);
 
     void updateNameById(Long id, String name);

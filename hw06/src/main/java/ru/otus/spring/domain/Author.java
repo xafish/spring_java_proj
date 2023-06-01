@@ -6,12 +6,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
+@Data
 @Entity
 @Table(name = "authors")
-@EqualsAndHashCode
 public class Author {
 
     @Id

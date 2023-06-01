@@ -17,12 +17,11 @@ public class BookRepositoryJpa implements BookRepository {
         this.em = em;
     }
 
-    private static String bookQueryStr = "select b from Book b" +
+    private static final String bookQueryStr = "select b from Book b" +
             " LEFT JOIN FETCH b.author " +
             " LEFT JOIN FETCH b.genre ";
 
     @Override
-    @Transactional
     public List<Book> findAll() {
         var query = em.createQuery(bookQueryStr, Book.class);
         return query.getResultList();
@@ -30,27 +29,31 @@ public class BookRepositoryJpa implements BookRepository {
 
     @Override
     public Book getById(long id) {
-        var query = em.createQuery(bookQueryStr.concat("where b.id = :id"), Book.class);
-        query.setParameter("id", id);
+        return em.find(Book.class,id);
+    }
+
+    @Override
+    public Book getByName(String name) {
+        var query = em.createQuery(bookQueryStr + " where b.name = :name", Book.class);
+        query.setParameter("name", name);
         return query.getSingleResult();
     }
 
     @Override
     public void deleteById(long id) {
-        var query = em.createQuery("delete from Book b where b.id = :id");
-        query.setParameter("id", id);
-        query.executeUpdate();
+        em.remove(getById(id));
     }
     @Override
     public void updateNameById(Long id, String name) {
-        var query = em.createQuery("update Book b set b.name = :name where b.id = :id");
-        query.setParameter("name", name);
-        query.setParameter("id", id);
-        query.executeUpdate();
+        Book book = getById(id);
+        if (book != null) {
+            book.setName(name);
+            em.persist(book);
+        }
     }
 
     @Override
     public void addBook(Book book) {
-        em.merge(book);
+        em.persist(book);
     }
 }

@@ -53,8 +53,7 @@ public class BookRepositoryTest {
 
         bookRepository.deleteById(EXISTING_BOOK_ID);
 
-        assertThatThrownBy(() -> bookRepository.getById(EXISTING_BOOK_ID))
-                .isInstanceOf(NoResultException.class);
+        assertThat(bookRepository.getById(EXISTING_BOOK_ID)).isNull();
     }
 
     @DisplayName("добавлять книгу в БД")

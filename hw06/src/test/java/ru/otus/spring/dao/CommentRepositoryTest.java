@@ -52,7 +52,7 @@ public class CommentRepositoryTest {
     @DisplayName("возвращать комментарии по имени книги и ID")
     @Test
     void shouldReturnExpectedComment() {
-        Long actualCommentsCount = commentRepositoryJpa.getCommentsByBookName("TestBookName_1").stream().count();
+        Long actualCommentsCount = (long) bookRepository.getByName("TestBookName_1").getComment().size();
         assertThat(actualCommentsCount).isEqualTo(2);
         Comment comment = commentRepositoryJpa.getCommentById(3L);
         assertThat(comment.getBook().getName()).isEqualTo("TestBookName_3");
@@ -79,7 +79,6 @@ public class CommentRepositoryTest {
 
         commentRepositoryJpa.deleteComment(commentRepositoryJpa.getCommentById(EXISTING_COMMENT_ID));
 
-        assertThatThrownBy(() -> commentRepositoryJpa.getCommentById(EXISTING_COMMENT_ID))
-                .isInstanceOf(NoResultException.class);
+        assertThat(commentRepositoryJpa.getCommentById(EXISTING_COMMENT_ID)).isNull();
     }
 }

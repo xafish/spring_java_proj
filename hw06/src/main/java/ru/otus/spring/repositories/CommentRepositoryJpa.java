@@ -13,7 +13,7 @@ import java.util.List;
 public class CommentRepositoryJpa implements CommentRepository{
     @PersistenceContext
     private final EntityManager em;
-    private static String commentQueryStr = "select c from Comment c" +
+    private static final String commentQueryStr = "select c from Comment c" +
             " LEFT JOIN FETCH c.book" +
             " LEFT JOIN FETCH c.book.author " +
             " LEFT JOIN FETCH c.book.genre ";
@@ -24,17 +24,8 @@ public class CommentRepositoryJpa implements CommentRepository{
     }
 
     @Override
-    public List<Comment> getCommentsByBookName(String bookName) {
-        var query = em.createQuery(commentQueryStr.concat("where c.book.name = :name"), Comment.class);
-        query.setParameter("name", bookName);
-        return query.getResultList();
-    }
-
-    @Override
     public Comment getCommentById(Long id) {
-        var query = em.createQuery(commentQueryStr.concat("where c.id = :id"), Comment.class);
-        query.setParameter("id", id);
-        return query.getSingleResult();
+        return em.find(Comment.class,id);
     }
 
     @Override
