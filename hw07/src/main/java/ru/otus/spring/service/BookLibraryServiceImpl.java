@@ -1,12 +1,7 @@
 package ru.otus.spring.service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
@@ -24,9 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class BookLibraryServiceImpl implements BookLibraryService{
 
-    @PersistenceContext
-    private final EntityManager em;
-
     private final BookRepository bookRepository;
 
     private final AuthorRepository authorRepository;
@@ -36,31 +28,31 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public String getAllBook() {
         AtomicReference<String> result = new AtomicReference<>("");
 
         bookRepository.findAll().forEach(
-                b-> result.set(result + (b.toString() + "\n"))
+                b-> result.set(result + (bookToString(b) + "\n"))
         );
 
         return result.get();
     }
 
     @Override
-    public Book getBookById(@ShellOption({"id", "u"}) Long id) {
-        return bookRepository.findById(id).orElse(null);
+    @Transactional
+    public String getBookById(Long id) {
+        return bookToString(bookRepository.findById(id).orElse(null));
     }
 
     @Override
-    @Transactional
-    public String deleteBook(@ShellOption({"id", "u"}) Long id) {
+    public String deleteBook(Long id) {
         bookRepository.deleteById(id);
         return "the book with id \"" + id +"\" has been successfully deleted";
     }
 
     @Override
-    @Transactional
-    public String setName(@ShellOption({"id", "u"}) Long id, @ShellOption({"name", "u"}) String name) {
+    public String setName(Long id, String name) {
         Optional<Book> bookOptional = bookRepository.findById(id);
         if (bookOptional.isPresent()) {
             Book book = bookOptional.get();
@@ -74,12 +66,11 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     }
 
     @Override
-    @Transactional
-    public String addBook(@ShellOption({"id", "u"}) Long id,
-                          @ShellOption({"bookName", "u"}) String bookName,
-                          @ShellOption({"authorName", "u"}) String authorName,
-                          @ShellOption({"authorLastName", "u"}) String authorLastName,
-                          @ShellOption({"genreName", "u"}) String genreName) {
+    public String addBook(Long id,
+                          String bookName,
+                          String authorName,
+                          String authorLastName,
+                          String genreName) {
 
         Optional<Author> author = authorRepository.findByNameAndLastname(authorName, authorLastName);
         if (author.isEmpty()) return "Author \"" + authorName + " " + authorLastName + "\" was not found";
@@ -106,8 +97,7 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     }
 
     @Override
-    @Transactional
-    public String getCommentsByBookName(@ShellOption({"bookName", "u"}) String bookName) {
+    public String getCommentsByBookName(String bookName) {
         AtomicReference<String> result = new AtomicReference<>("");
 
         bookRepository.findByName(bookName).getComment().forEach(
@@ -117,28 +107,31 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     }
 
     @Override
-    @Transactional
-    public String addComment(@ShellOption({"bookId", "u"}) Long bookId,
-                             @ShellOption({"text", "u"}) String text,
-                             @ShellOption({"userName", "u"}) String userName) {
+    public String addComment(Long bookId,
+                             String text,
+                             String userName) {
         Optional<Book> book = bookRepository.findById(bookId);
         if (book.isEmpty())  return "Book \"" + bookId + "\" was not found";
         Comment comment = new Comment(book.get(), text, userName);
         book.get().getComment().add(comment);
         bookRepository.save(book.get());
-        //commentRepository.save(comment);
 
         return "the comment \n " + comment + " \n has been successfully inserted";
     }
 
     @Override
-    @Transactional
-    public String deleteComment(@ShellOption({"id", "u"}) Long id) {
+    public String deleteComment(Long id) {
         Optional<Comment> comment;
         comment = commentRepository.findById(id);
         if (comment.isEmpty()) return "Comment with id \"" + id + "\" was not found";
         commentRepository.delete(comment.get());
         return "the comment \n " + comment + " \n has been successfully deleted";
+    }
+
+    private String bookToString(Book book) {
+        if (book == null) return "";
+        Author author = book.getAuthor();
+        return book + ", " + author;
     }
 
 }

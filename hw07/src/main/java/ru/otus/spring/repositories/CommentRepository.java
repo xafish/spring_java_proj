@@ -9,11 +9,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @EntityGraph(attributePaths = {"book", "book.author", "book.genre"})
+    @EntityGraph(attributePaths = {"book"})
     List<Comment> findAll();
 
-    /*List<Comment> getAllComments();
-    Comment getCommentById(Long id);
-    void addComment(Comment comment);
-    void deleteComment(Comment comment);*/
 }

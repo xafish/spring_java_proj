@@ -6,7 +6,7 @@ public interface BookLibraryService {
 
     String getAllBook();
 
-    Book getBookById(Long id);
+    String getBookById(Long id);
 
     String deleteBook(Long id);
 

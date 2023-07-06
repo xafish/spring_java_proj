@@ -19,7 +19,7 @@ public class DataManagerShell {
     }
 
     @ShellMethod(key = "get", value = "Get book by id")
-    public Book getBookById(@ShellOption({"id", "u"}) Long id) {
+    public String getBookById(@ShellOption({"id", "u"}) Long id) {
         return bookLibraryService.getBookById(id);
     }
 
