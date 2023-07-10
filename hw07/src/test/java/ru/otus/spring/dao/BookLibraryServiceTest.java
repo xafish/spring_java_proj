@@ -16,6 +16,8 @@ import ru.otus.spring.repositories.BookRepository;
 import ru.otus.spring.service.BookLibraryService;
 import ru.otus.spring.service.BookLibraryServiceImpl;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -47,15 +49,15 @@ public class BookLibraryServiceTest {
     @DisplayName("возвращать все книги в БД")
     @Test
     void shouldReturnAllBooks() {
-        String allBook = bookLibraryService.getAllBook();
+        List<Book> allBook = bookLibraryService.getAllBook();
         assertThat(allBook).isNotEmpty();
     }
 
     @DisplayName("возвращать книгу по ID")
     @Test
     void shouldReturnExpectedBook() {
-        String actualBook = bookLibraryService.getBookById(EXPECTED_BOOK.getId());
-        assertThat(actualBook.contains("Book{id="+EXPECTED_BOOK.getId())).isTrue();
+        Book actualBook = bookLibraryService.getBookById(EXPECTED_BOOK.getId());
+        assertThat(actualBook.equals(EXPECTED_BOOK)).isTrue();
     }
 
     @DisplayName("удалять книгу по id")
@@ -65,7 +67,7 @@ public class BookLibraryServiceTest {
 
         bookLibraryService.deleteBook(EXISTING_BOOK_ID);
 
-        assertThat(bookLibraryService.getBookById(EXISTING_BOOK_ID)).isEqualTo("");
+        assertThat(bookLibraryService.getBookById(EXISTING_BOOK_ID)).isEqualTo(null);
     }
 
     @DisplayName("добавлять книгу в БД")
@@ -79,8 +81,8 @@ public class BookLibraryServiceTest {
         );
 
         bookLibraryService.addBook(expectedBook.getId(), expectedBook.getName(), expectedBook.getAuthor().getName(), expectedBook.getAuthor().getLastname(), expectedBook.getGenre().getName());
-        String actualBook = bookLibraryService.getBookById(expectedBook.getId());
-        assertThat(actualBook.contains("Book{id="+expectedBook.getId())).isTrue();
+        Book actualBook = bookLibraryService.getBookById(expectedBook.getId());
+        assertThat(actualBook.equals(expectedBook)).isTrue();
     }
 
     @DisplayName("изменять имя книги в БД")
@@ -88,8 +90,8 @@ public class BookLibraryServiceTest {
     void shouldUpdateBook() {
         String newName = "Test_updated_book";
         bookLibraryService.setName(EXPECTED_BOOK.getId(),newName);
-        String updatedBook = bookLibraryService.getBookById(EXPECTED_BOOK.getId());
-        assertThat(updatedBook.contains("name='"+newName+"'")).isTrue();
+        Book updatedBook = bookLibraryService.getBookById(EXPECTED_BOOK.getId());
+        assertThat(updatedBook.getName().equals(newName)).isTrue();
     }
 
     @DisplayName("возвращать все комментарии")

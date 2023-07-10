@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @AllArgsConstructor
 @ShellComponent
@@ -15,12 +18,17 @@ public class DataManagerShell {
 
     @ShellMethod(key = "get all", value = "Get all books")
     public String getAllBook() {
-        return bookLibraryService.getAllBook();
+        AtomicReference<String> result = new AtomicReference<>("");
+
+        bookLibraryService.getAllBook().forEach(
+                b-> result.set(result + (b.toString() + "\n"))
+        );
+        return result.get();
     }
 
     @ShellMethod(key = "get", value = "Get book by id")
     public String getBookById(@ShellOption({"id", "u"}) Long id) {
-        return bookLibraryService.getBookById(id);
+        return bookLibraryService.getBookById(id).toString();
     }
 
     @ShellMethod(key = "delete", value = "Delete book by id from DB")
@@ -33,7 +41,6 @@ public class DataManagerShell {
         return bookLibraryService.setName(id,name);
     }
     @ShellMethod(key = "add book", value = "Add book id, name, author name, author lastname and genre name")
-    @Transactional
     public String addBook(@ShellOption({"id", "u"}) Long id,
                           @ShellOption({"bookName", "u"}) String bookName,
                           @ShellOption({"authorName", "u"}) String authorName,

@@ -12,6 +12,7 @@ import ru.otus.spring.repositories.BookRepository;
 import ru.otus.spring.repositories.CommentRepository;
 import ru.otus.spring.repositories.GenreRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,21 +29,14 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     private final CommentRepository commentRepository;
 
     @Override
-    @Transactional
-    public String getAllBook() {
-        AtomicReference<String> result = new AtomicReference<>("");
-
-        bookRepository.findAll().forEach(
-                b-> result.set(result + (bookToString(b) + "\n"))
-        );
-
-        return result.get();
+    public List<Book> getAllBook() {
+        return bookRepository.findAll();
     }
 
     @Override
     @Transactional
-    public String getBookById(Long id) {
-        return bookToString(bookRepository.findById(id).orElse(null));
+    public Book getBookById(Long id) {
+        return bookRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -86,6 +80,7 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     }
 
     @Override
+    @Transactional
     public String getAllComment() {
         AtomicReference<String> result = new AtomicReference<>("");
 
@@ -97,12 +92,14 @@ public class BookLibraryServiceImpl implements BookLibraryService{
     }
 
     @Override
+    @Transactional
     public String getCommentsByBookName(String bookName) {
         AtomicReference<String> result = new AtomicReference<>("");
+        Optional<Book> book =  bookRepository.findByName(bookName);
 
-        bookRepository.findByName(bookName).getComment().forEach(
-                b-> result.set(result + (b.toString() + "\n"))
-        );
+        book.ifPresent(value -> value.getComment().forEach(
+                b -> result.set(result + (b.toString() + "\n"))
+        ));
         return result.get();
     }
 
@@ -128,10 +125,5 @@ public class BookLibraryServiceImpl implements BookLibraryService{
         return "the comment \n " + comment + " \n has been successfully deleted";
     }
 
-    private String bookToString(Book book) {
-        if (book == null) return "";
-        Author author = book.getAuthor();
-        return book + ", " + author;
-    }
 
 }
